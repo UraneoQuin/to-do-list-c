@@ -13,11 +13,15 @@ const int buffer = 1000;
 //Enumerador de estados tarea
 enum{COMPLETA,INCOMPLETA,FALLIDA};
 
+//Enumerador de importancia de tarea
+enum{ALTA,MEDIA,BAJA};
+
 //Estructura tarea
 struct TAREA
 {
     char nombre[1000];
     char descripcion[1000];
+    int importancia;
     int estado;
     char fechaInicio[1000];
     char fechaVence[10000];
@@ -50,7 +54,8 @@ char* obtenerFecha()
 }
 
 //Funcion crear tarea
-struct TAREA* crearTarea(char* nombre,char* descripcion,char* fechaVence)
+struct TAREA* crearTarea(char* nombre,char* descripcion,char* fechaVence,
+                         int importancia)
 {
     //Asignacion de memoria
     struct TAREA* tarea = (struct TAREA*)malloc(sizeof(struct TAREA)*1);
@@ -64,8 +69,47 @@ struct TAREA* crearTarea(char* nombre,char* descripcion,char* fechaVence)
     strcpy(tarea->descripcion,descripcion);
     strcpy(tarea->fechaVence,fechaVence);
     strcpy(tarea->fechaInicio,obtenerFecha());
+    tarea->importancia = importancia;
     tarea->estado = INCOMPLETA;
 }
+
+//Interfaz crear tarea
+struct TAREA* menuTarea()
+{
+    //Asignacion de memoria
+    struct TAREA* aux = (struct TAREA*)malloc(sizeof(struct TAREA)*1);
+    //Excepcion asignacion memoria
+    if(aux == NULL)
+    {
+        printf("Error Asignacion memoria invalida");
+        exit(1);
+    }
+    //Var aux entradas
+    char nombre[buffer];
+    char descripcion[buffer];
+    char fechaVence[buffer];
+    char importancia[buffer];
+    //Entrada de usuario
+    printf("===============CREAR TAREA=================");
+    SALTARLINEA(2);
+    printf("Digitar nombre:");
+    fgets(nombre,buffer,stdin);
+    printf("Digitar descripcion:");
+    fgets(descripcion,buffer,stdin);
+    printf("Digitar caducidad:");
+    fgets(fechaVence,buffer,stdin);
+    printf("Digitar importancia (0-ALTA,1-MEDIA,2-BAJA):");
+    fgets(importancia,buffer,stdin);
+    importancia[strcspn(importancia,"\n")] = '\0';
+    //Excepcion entrada importancia
+    if(strcmp(importancia,"0") != 0 && atoi(importancia) == 0)
+    {
+        printf("Entrada invalida: por defecto importancia es ALTA\n");
+    }
+    aux = crearTarea(nombre,descripcion,fechaVence,atoi(importancia));
+    return aux;
+}
+
 
 //Funcion crear NODO AVL
 struct NODOAVL* crearNodo(struct TAREA* tarea)
@@ -222,34 +266,8 @@ struct NODOAVL* insertarNodo(struct NODOAVL* nodo,struct TAREA* tarea)
     return nodo;
 }
 
-//Funcion impresion tarea
-void imprimirTarea(struct TAREA* tarea)
-{
-    printf("================TAREA================");
-    SALTARLINEA(2);
-    printf("Nombre:%s\n",tarea->nombre);
-    printf("Descripcion:%s\n",tarea->descripcion);
-    printf("Fecha vencimiento:%s\n",tarea->fechaVence);
-    printf("Fecha:%s\n",tarea->fechaInicio);
-    //Excepcion estado completa
-    if(tarea->estado == COMPLETA)
-    {
-        printf("Estado tarea:COMPLETA");
-    }
-    else if(tarea->estado == INCOMPLETA)
-    {
-        printf("Estado tarea:INCOMPLETA");
-    }
-    else
-    {
-        printf("Estado tarea:FALLIDA");
-    }
-    getchar();
-}
-
 int main()
 {
-    struct NODOAVL* nodo = NULL;
-    return 0;
+    struct TAREA* tarea = menuTarea();
 }
 
